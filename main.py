@@ -2,16 +2,57 @@ import random
 import math
 import copy
 import sys
+from importlib import import_module
 
-repetitions = 7
-max_iter = 250
-mut_rate = 0.3
-pop_size = 300
-selection_size = 2
-round_precision = 12
-precision = 0.000001
-intervalX = [-1.5, 4]
-intervalY = [-3, 4]
+
+#dynamic variable initialisation from a random .py file:
+def dynamic_import(abs_module_path, class_name):
+    module_object = import_module(abs_module_path)
+    try:
+        target_class = getattr(module_object, class_name)
+        return target_class
+    except AttributeError:
+        pass
+    return None
+
+#hardcoding a value if not given
+def hardcode(variable, value):
+    if variable is None:
+        return value
+    return variable
+
+#reading file path for configuration:
+configFile = None
+outfilePath = None
+if len(sys.argv) > 1:
+    configFile = sys.argv[1]
+
+#if no file is set we use config
+if configFile is None:
+    configFile = "config"
+
+#reading and hardcoding variables if needed
+pop_size = dynamic_import(configFile, "pop_size")
+pop_size = hardcode(pop_size, 150)
+repetitions = dynamic_import(configFile, "repetitions")
+repetitions = hardcode(repetitions, 3)
+max_iter = dynamic_import(configFile, "max_iter")
+max_iter = hardcode(max_iter, 100) 
+mut_rate = dynamic_import(configFile, "mut_rate")
+mut_rate = hardcode(mut_rate, 0.2)
+selection_size = dynamic_import(configFile, "selection_size")
+selection_size = hardcode(selection_size, 5)
+round_precision = dynamic_import(configFile, "round_precision")
+round_precision = hardcode(round_precision, 4)
+precision = dynamic_import(configFile, "precision")
+precision = hardcode(precision, 0.00001)
+intervalX = dynamic_import(configFile, "intervalX")
+intervalX = hardcode(intervalX, [-1.5, 4])
+intervalY = dynamic_import(configFile, "intervalY")
+intervalY = hardcode(intervalY, [-3, 4])
+times = dynamic_import(configFile, "times")
+times = hardcode(times, 1)
+outfilePath = dynamic_import(configFile, "outfilePath")
 
 #other variables
 currChromosomeBinary = ""
@@ -32,15 +73,17 @@ numberOfBits = calculateNumberOfBits()
 
 # f(x,y) will also be used as the fitness function
 # McCormick function for minimizing:
-def fitness(chromosome):
+def mcCormick(chromosome):
     x = chromosome[0]
     y = chromosome[1]
-    return round(math.sin(x + y) + (x - y)**2 - 1.5*x + 2.5*y + 1, round_precision)
+    return round(math.sin(x + y) + (x - y)*(x - y) - 1.5 * x + 2.5 * y + 1, round_precision)
 
+#fitness function is McCormick function on binary data
 def fitness_from_binary(chromBinary):
     chromosome = encode(chromBinary)
     chromosome = denumerateChr(chromosome)
-    return fitness(chromosome)
+    return mcCormick(chromosome)
+
 
 #from scope to descrete values:
 def enumerateChr(chromosome):
@@ -149,14 +192,17 @@ def selectionTournament(population, size):
 #main algorithm:
 def genetic_algorithm():
     npop_size = pop_size
-    outfile = sys.stdout
+
+    if outfilePath is None:
+        outfile = sys.stdout
+    else:
+        outfile = open(outfilePath, "w")
 
     print('Algorithm started...', file=outfile)
     for k in range(repetitions):
         best_chromosome = None
         best_fitness_value = None
         iter = 0
-
         # initial population generation
         pop = []
         ll = ["0","1"]
@@ -213,12 +259,12 @@ def genetic_algorithm():
             print('Generation {}: best chromosome fitness: {}, average fitness: {}'.format(iter, fit_val, generation_average_fitness), file=outfile)
             iter += 1
 
-        print('Algorithm finished in {} generations.'.format(iter))
-        print('Best chromosome: ', denumerateChr(encode(best_chromosome)))
+        print('Algorithm finished in {} generations.'.format(iter), file=outfile)
+        print('Best chromosome: ', denumerateChr(encode(best_chromosome)), file=outfile)
+
 
 chrom = [-0.54719, -1.54719]
-print("Solution should be: {}\n".format(fitness(chrom)))
+solution = mcCormick(chrom)
+print("Solution should be: {}\n".format(solution))
 genetic_algorithm()
-
- 
 
