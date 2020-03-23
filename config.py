@@ -1,0 +1,10 @@
+repetitions = 3
+max_iter = 250
+mut_rate = 0.3
+pop_size = 300
+selection_size = 2
+round_precision = 8
+precision = 0.000001
+intervalX = [-1.5, 4]
+intervalY = [-3, 4]
+times = 1
