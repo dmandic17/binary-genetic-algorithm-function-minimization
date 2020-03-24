@@ -12,11 +12,11 @@
 
 ## Configuration
 Configuration parameters are:
-```python
+```
 pop_size = population size >0
 repetitions = how many times should the algorithm run
 max_iter = maximum number of generations for one population
-mut_rate = probability of a bit being mutated<\br>
+mut_rate = probability of a bit being mutated
 selection_size = how many chromosomes are selected for a tournament
 round_precision = number of decimal point numbers for solution
 precision = decimal number representing the precision used for the chromosomes
@@ -26,9 +26,9 @@ times = additional parameter used for slowing the convergence if set to >0, if =
 ```
 
 ## Running the algorithm
-```shell
+`
 python main.py
-```\
+`\
 You can add some file path for the configuration file, if you don't add it the default will be used.
 
 ## Demo with graphs
